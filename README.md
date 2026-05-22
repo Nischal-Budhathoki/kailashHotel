@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # 🏨 Kailash Hotel Management System
 
 A scalable full-stack hotel management system built with modern web technologies, focusing on performance, maintainability, and production-ready architecture.
@@ -138,3 +139,55 @@ Scalable and containerized architecture
                   🔥 :contentReference[oaicite:4]{index=4}
                   
                   Just say 👍
+=======
+# Kailash Hotel Management System
+
+A full-stack web application for managing hotel operations including room booking, customer management, and administrative control.
+
+
+
+### Frontend
+- HTML
+- CSS
+- Tailwind CSS
+- Next.js
+- TypeScript
+
+### Backend
+- Node.js
+- Express.js
+- TypeScript
+
+### Database
+- PostgreSQL
+- Prisma ORM
+- Neon (cloud database)
+
+---
+
+## 🏗️ Project Structure
+- frontend
+- backend
+- nginx
+- docker
+
+
+---
+
+## 📦 Features (Planned / In Progress)
+- Room booking system
+- User authentication
+- Admin dashboard
+- Payment integration
+- Booking history
+
+---
+
+## ⚙️ How to Run
+
+### Frontend
+```bash
+cd frontend
+npm install
+npm run dev
+>>>>>>> 8632923 (prisma work issue)
