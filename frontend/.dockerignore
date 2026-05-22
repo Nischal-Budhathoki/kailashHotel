@@ -1,0 +1,19 @@
+# dependencies
+node_modules
+
+# next
+.next
+
+# logs
+*.log
+
+# git
+.git
+
+# env
+.env
+.env.local
+.env.*.local
+
+# mac
+.DS_Store
