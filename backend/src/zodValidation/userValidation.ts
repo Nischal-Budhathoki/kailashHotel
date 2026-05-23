@@ -4,6 +4,7 @@ import { z } from "zod"
 export const userRoleEnum = z.enum(["ADMIN", "USER"]);
 
 export const createUserSchema = z.object({
+  id: z.string().transform((val) => Number(val)),
   email: z
     .string()
     .email("Invalid email format")
