@@ -3,9 +3,9 @@
     "rootDir": "./src",
     "outDir": "./dist",
 
-    "target": "ES2023",
-    "module": "CommonJS",
-    "moduleResolution": "node",
+      "target": "ES2023",
+    "module": "esnext",
+    "moduleResolution": "bundler",
 
     "esModuleInterop": true,
     "resolveJsonModule": true,
@@ -25,3 +25,5 @@
   },
   "include": ["src"]
 }
+
+

@@ -1,0 +1,100 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Get a free hosted Postgres database in seconds: `npx create-db`
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id       Int    @id @default(autoincrement())
+  email    String @unique
+  name     String
+  password String
+
+  role      Role      @default(USER)
+  deletedAt DateTime?
+
+  bookings Booking[]
+  profile  Profile[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+enum Role {
+  ADMIN
+  USER
+}
+
+model Room {
+  id          Int     @id @default(autoincrement())
+  roomNumber  Int     @unique
+  type        String // single, double, suite
+  price       Float
+  isAvailable Boolean @default(true)
+
+  bookings Booking[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Booking {
+  id Int @id @default(autoincrement())
+
+  userId Int
+  roomId Int
+
+  user User @relation(fields: [userId], references: [id])
+  room Room @relation(fields: [roomId], references: [id])
+
+  checkIn  DateTime
+  checkOut DateTime
+
+  status BookingStatus @default(PENDING)
+
+  payment Payment?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+enum BookingStatus {
+  PENDING
+  CONFIRMED
+  CANCELLED
+  COMPLETED
+}
+
+model Payment {
+  id Int @id @default(autoincrement())
+
+  bookingId Int     @unique
+  booking   Booking @relation(fields: [bookingId], references: [id])
+
+  amount Float
+  method String // card, cash, online
+  status String // pending, paid, failed
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Profile {
+  id     Int @id @default(autoincrement())
+  userId Int @unique
+
+  user User @relation(fields: [userId], references: [id])
+
+  phone    String?
+  address  String?
+  country  String?
+  passport String?
+}
