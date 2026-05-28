@@ -73,7 +73,7 @@ export const userReadController = async (
 
     // 2. fetch user
     const user = await prisma.user.findUnique({
-      where: { id },
+      where: { id , deletedAt: null,},
     });
 
     // 3. not found
