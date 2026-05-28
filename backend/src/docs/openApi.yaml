@@ -1,0 +1,241 @@
+
+openapi: 3.0.0
+
+info:
+  title: Hotel Management System API
+  version: 1.0.0
+  description: API documentation for Hotel Management System
+
+servers:
+  - url: http://localhost:5000/api
+
+paths:
+
+  /rooms:
+    get:
+      summary: Get all rooms
+      tags:
+        - Rooms
+
+      responses:
+        '200':
+          description: List of rooms
+
+    post:
+      summary: Create a room
+      tags:
+        - Rooms
+
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateRoom'
+
+      responses:
+        '201':
+          description: Room created successfully
+
+  /rooms/{id}:
+    get:
+      summary: Get single room
+      tags:
+        - Rooms
+
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+
+      responses:
+        '200':
+          description: Single room data
+
+    put:
+      summary: Update room
+      tags:
+        - Rooms
+
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+
+      responses:
+        '200':
+          description: Room updated successfully
+
+    delete:
+      summary: Delete room
+      tags:
+        - Rooms
+
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+
+      responses:
+        '200':
+          description: Room deleted successfully
+
+  /users:
+    get:
+      summary: Get all users
+      tags:
+        - Users
+
+      responses:
+        '200':
+          description: List of users
+
+    post:
+      summary: Create user
+      tags:
+        - Users
+
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateUser'
+
+      responses:
+        '201':
+          description: User created successfully
+
+  /users/{id}:
+    get:
+      summary: Get single user
+      tags:
+        - Users
+
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+
+      responses:
+        '200':
+          description: Single user data
+
+    put:
+      summary: Update user
+      tags:
+        - Users
+
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateUser'
+
+      responses:
+        '200':
+          description: User updated successfully
+
+    delete:
+      summary: Delete user
+      tags:
+        - Users
+
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+
+      responses:
+        '200':
+          description: User deleted successfully
+
+components:
+  schemas:
+
+    Room:
+      type: object
+      properties:
+        id:
+          type: integer
+
+        roomNumber:
+          type: string
+
+        type:
+          type: string
+
+        price:
+          type: number
+
+        status:
+          type: string
+
+    CreateRoom:
+      type: object
+
+      required:
+        - roomNumber
+        - type
+        - price
+
+      properties:
+        roomNumber:
+          type: string
+
+        type:
+          type: string
+
+        price:
+          type: number
+
+    User:
+      type: object
+
+      properties:
+        id:
+          type: integer
+
+        name:
+          type: string
+
+        email:
+          type: string
+
+        role:
+          type: string
+
+    CreateUser:
+      type: object
+
+      required:
+        - name
+        - email
+
+      properties:
+        name:
+          type: string
+
+        email:
+          type: string
+
+        password:
+          type: string

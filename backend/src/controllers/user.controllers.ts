@@ -3,6 +3,8 @@ import { prisma } from "../config/prisma";
 import { createUserSchema } from "../zodValidation/userValidation";
 import { userIdSchema } from "../zodValidation/idValidation";
 import { success } from "zod";
+import { Role } from "../generated/prisma/enums";
+import { updateUserSchema } from "../zodValidation/updateValidation";
 
 
 // create-user
@@ -100,31 +102,82 @@ export const userReadController = async (
 
 //read-all-user
 export const allUserController = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
+  req:Request,
+   res:Response,
+   next:NextFunction
+  ) => {
   try {
-    // 1. fetch all users
-    const users = await prisma.user.findMany();
+    const users = await prisma.user.findMany({
+      where: {
+        deletedAt: null, 
+      },
+    });
 
-    // 2. if empty (optional check)§§ß
-    if (!users || users.length === 0) {
-      return res.status(404).json({
-        success: false,
-        message: "No users found",
-      });
-    }
-
-    // 3. success response
     return res.status(200).json({
       success: true,
       data: users,
     });
 
   } catch (error) {
-    console.error(error);
+    return res.status(500).json({
+      success: false,
+      message: "Internal Server Error",
+    });
+  }
+};
 
+//update-one user
+export const updateUser = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const result = userIdSchema.safeParse(req.params.id);
+
+    if (!result.success) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid user ID",
+        error: result.error.flatten(),
+      });
+    }
+
+    const userId = Number(result.data);
+
+    const bodyResult = updateUserSchema.safeParse(req.body);
+
+    if (!bodyResult.success) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid update data",
+        error: bodyResult.error.flatten(),
+      });
+    }
+
+    const existingUser = await prisma.user.findUnique({
+      where: { id: userId },
+    });
+
+    if (!existingUser) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found",
+      });
+    }
+
+    const updatedUser = await prisma.user.update({
+      where: { id: userId },
+      data: bodyResult.data,
+    });
+
+    return res.status(200).json({
+      success: true,
+      message: "User updated successfully",
+      data: updatedUser,
+    });
+
+  } catch (error) {
     return res.status(500).json({
       success: false,
       message: "Internal Server Error",
@@ -134,5 +187,77 @@ export const allUserController = async (
 
 
 // delete-single-user
+export const deleteUser = async (
+  req:Request, 
+  res:Response, 
+  next:NextFunction
+) => {
+  try {
+    const result = userIdSchema.safeParse(req.params.id);
+
+    if (!result.success) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid user ID",
+        error: result.error.flatten(),
+      });
+    }
+
+    const userId = Number(result.data);
+
+    const user = await prisma.user.delete({
+      where: { id: userId },
+      data: {
+        deletedAt: new Date(), 
+      },
+    });
+
+    return res.status(200).json({
+      success: true,
+      message: "User deleted successfully",
+      data: user,
+    });
+
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: "Internal Server Error",
+    });
+  }
+};
+
+//deleting many users
+export const deleteUsersByRole = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const role = req.body.role;
+
+    if (!role) {
+      return res.status(400).json({
+        success: false,
+        message: "Role is required",
+      });
+    }
+
+    const result = await prisma.user.deleteMany({
+      where: { role },
+    });
+
+    return res.status(200).json({
+      success: true,
+      message: `Users with role ${role} deleted`,
+      data: result,
+    });
+
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: "Internal Server Error",
+    });
+  }
+};
 
 // update-user
