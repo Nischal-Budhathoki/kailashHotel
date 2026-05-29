@@ -1,5 +1,5 @@
 import { z } from "zod"
-
+import { Role } from "../generated/prisma/enums";
 
 export const userRoleEnum = z.enum(["ADMIN", "USER"]);
 
@@ -26,5 +26,5 @@ export const createUserSchema = z.object({
       "Password must contain uppercase, lowercase, and number"
     ),
 
-  role: userRoleEnum.optional(), // default handled by Prisma (USER)
+  role: z.nativeEnum(Role).optional().default(Role.USER), // default handled by Prisma (USER)
 });
