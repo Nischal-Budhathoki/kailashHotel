@@ -34,7 +34,7 @@ The system is built with a modular architecture to ensure scalability and future
 - Docker (containerization)
 - Nginx (reverse proxy)
 - GitHub Actions (CI/CD - planned)
-
+-- Kubernetes
 ---
 
 ## 🏗️ Architecture
@@ -53,6 +53,7 @@ frontend/   → Next.js application
 backend/    → Express API server
 nginx/      → Reverse proxy configuration
 docker/     → Docker & docker-compose setup
+kubernetes/ → Kubernetes deployment setup
 
 ----------
 🚀 Features
