@@ -1,13 +1,15 @@
 #!/bin/bash
-
 set -e
 
-#building docker file
-echo "🐳 Building Docker image..."
-docker build -t hotel-app .
+APP_NAME="hotel-management-system"
 
-#docker container running
-echo "🚀 Running container..."
-docker run -p 3000:3000 --name hotel-app hotel-app
+echo "Stopping old container..."
+docker stop $APP_NAME || true
+docker rm $APP_NAME || true
 
-echo "✅ Docker deployment completed"
+echo "Starting new container..."
+docker run -d \
+  --name $APP_NAME \
+  -p 3000:3000 \
+  --env-file .env \
+  $APP_NAME:latest
