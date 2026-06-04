@@ -1,25 +1,53 @@
-import express from "express"
+import express from "express";
+import cors from "cors";
+import helmet from "helmet";
+import compression from "compression";
+import cookieParser from "cookie-parser";
+
+import { requestIdMiddleware } from "./middleware/requestId.middleware.js";
+import { pinoMiddleware } from "./middleware/pino.middleware.js";
+import { errorHandler } from "../src/middleware/error.middleware.js";
+
 import userRouter from "./routes/user.routes.js";
-import authRouter from "../src/routes/auth.routes.js"
-import roomRouter from "../src/routes/room.routes.js"
-import bookRouter from "../src/routes/book.routes.js"
+import authRouter from "./routes/auth.routes.js";
+import roomRouter from "./routes/room.routes.js";
+import bookRouter from "./routes/book.routes.js";
+import { createRateLimiter } from "./security/globalRateLimits.js";
+
 const app = express();
 
+//security-helmet
+app.use(helmet());
+
+app.use(cors({
+  origin: process.env.CLIENT_URL,
+  credentials: true,
+}));
+
+//performance
+app.use(compression());
+
+//cookie-parser
 app.use(express.json());
-
-// parse URL encoded data
 app.use(express.urlencoded({ extended: true }));
+app.use(cookieParser());
 
-//user-routes
-app.use("/api/v1",userRouter);
+//request-trace
+app.use(requestIdMiddleware);
 
-//login-register-routes
+//login-traces
+app.use(pinoMiddleware);
+
+//rate-limitting
+app.use(createRateLimiter);
+
+//routes
+app.use("/api/v1", userRouter);
 app.use("/api/v1/auth", authRouter);
-
-//room-routes
-app.use("/api/v1/rooms", roomRouter)
-
-//book-routes
+app.use("/api/v1/rooms", roomRouter);
 app.use("/api/v1/book", bookRouter);
 
-export default app
+//error-handler-middleware
+app.use(errorHandler);
+
+export default app;
