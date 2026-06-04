@@ -7,25 +7,27 @@ import {
   readRoom,
   updateRoom,
 } from "../controllers/room.controller";
+import { roomRateLimiter } from "../security/roomRateLimits";
 
 const router = express.Router();
 
 // CREATE room
-router.post("/", createRoom);
+router.post("/", roomRateLimiter,createRoom);
 
 // GET all rooms
-router.get("/", readAllRooms);
+router.get("/", roomRateLimiter, readAllRooms);
 
 // GET single room
-router.get("/:id", readRoom);
+router.get("/:id",roomRateLimiter,  readRoom);
 
 // UPDATE room
-router.put("/:id", updateRoom);
+router.put("/:id",  roomRateLimiter, updateRoom);
 
 // DELETE single room
-router.delete("/:id", deleteRoom);
+router.put("/:id",  roomRateLimiter, updateRoom);
+router.delete("/:id",roomRateLimiter,  deleteRoom);
 
 // DELETE multiple rooms
-router.delete("/", deleteMultipleRooms);
+router.delete("/", roomRateLimiter, deleteMultipleRooms);
 
 export default router;

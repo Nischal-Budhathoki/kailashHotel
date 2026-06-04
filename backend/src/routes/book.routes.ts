@@ -7,25 +7,26 @@ import {
   deleteBooking,
   deleteAllBooking,
 } from "../controllers/book.controller.js";
+import { bookRateLimiter } from "../security/bookRateLimits.js";
 
 const router = express.Router();
 
 //crate-booking
-router.post("/", createBooking);
+router.post("/",bookRateLimiter, createBooking);
 
 //read-multiple-booking
-router.get("/", readMultiple);
+router.get("/", bookRateLimiter,readMultiple);
 
 //read-single-booking
-router.get("/:id", readBooking);
+router.get("/:id", bookRateLimiter,readBooking);
 
 //update-booking
-router.put("/:id", updateBooking);
+router.put("/:id", bookRateLimiter,updateBooking);
 
 //delete-single-booking
-router.delete("/:id", deleteBooking);
+router.delete("/:id", bookRateLimiter,deleteBooking);
 
 //delete-multiple-booking
-router.delete("/", deleteAllBooking);
+router.delete("/", bookRateLimiter,deleteAllBooking);
 
 export default router;

@@ -3,14 +3,19 @@ import jwt from "jsonwebtoken"
 import bcrypt from "bcryptjs"
 import { prisma } from "../config/prisma";
 import { Role } from "../generated/prisma";
+import { comparePassword } from "../utils/password";
+import { generateAccessToken, generateRefreshToken } from "../utils/jwt";
 
 const JWT_SECRET = process.env.JWT_SECRET as string;
 
-export const loginUser = async (
-    email:string,
-    password:string,
-    
-) =>{
+type loginInput = {
+    id:string,
+    user:string;
+    email:string;
+    password:string;
+}
+
+export const loginUser = async ({email, password}:loginInput)=>{
             //find the user
             const user = await prisma.user.findUnique({
                 where:{email: email},
@@ -28,6 +33,15 @@ export const loginUser = async (
         if(!isPasswordMatched){
             throw new Error("Password didn't matched, Try Again !!!");
         }
+
+        //generating payload
+        const payload ={
+            userId:user.id,
+            role:user.role
+        }
+
+        const accessToken = generateAccessToken(payload);
+        const refreshToken = generateRefreshToken(payload);
 
         //generate the token
         const token = jwt.sign(

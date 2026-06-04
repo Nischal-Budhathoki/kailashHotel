@@ -6,7 +6,12 @@ import "dotenv/config"
 import { success } from 'zod';
 import { prisma } from '../config/prisma';
 import { Role } from "../generated/prisma/enums";
+import { hashPassword } from '../utils/password';
 
+type AuthService = {
+    user:string,
+    password:string
+}
 
 export const userRegistration = async (
     req:Request,
@@ -42,7 +47,7 @@ export const userRegistration = async (
     }
 
     //hash the password
-    const hashedPassword = await bcrypt.hash(password, 10);
+    bcrypt.hash(password, 10);
 
     //now create a new user 
     const createdUser = await prisma.user.create({
@@ -50,9 +55,11 @@ export const userRegistration = async (
             name,
             email,
             role,
-            password:hashedPassword,
+            password:hashPassword,
         },
     })
+
+   
 
     //if all sucess, finally the response 
     return res.status(201).json({
