@@ -1,17 +1,29 @@
-import { NextFunction, Request, Response } from "express";
-import { bookingIdSchema, createBookingSchema, deleteBookingsSchema } from "../zodValidation/bookingValidation";
-import { success } from "zod";
-import { prisma } from "../config/prisma";
+import { Request, Response } from "express";
+
+import {
+  bookingIdSchema,
+  createBookingSchema,
+  deleteBookingsSchema,
+} from "../zodValidation/bookingValidation";
+
 import { updateBookingSchema } from "../zodValidation/updateSchemaValidation";
 
-//create-booking
+import {
+  createBookingService,
+  getBookingByIdService,
+  getAllBookingsService,
+  updateBookingService,
+  deleteBookingService,
+  deleteManyBookingsService,
+} from "../services/booking.service";
+
+
+// CREATE BOOKING
 export const createBooking = async (
   req: Request,
-  res: Response,
-  next: NextFunction
+  res: Response
 ) => {
   try {
-    // 1. Validate input
     const result = createBookingSchema.safeParse(req.body);
 
     if (!result.success) {
@@ -22,37 +34,20 @@ export const createBooking = async (
       });
     }
 
-    const { userId, roomId, checkIn, checkOut, status } = result.data;
+    const userId = req.user?.id;
 
-    // 2. Check room exists
-    const room = await prisma.room.findUnique({
-      where: { id: roomId },
-    });
-
-    if (!room) {
-      return res.status(404).json({
+    if (!userId) {
+      return res.status(401).json({
         success: false,
-        message: "Room not found",
+        message: "Unauthorized",
       });
     }
 
-    // 3. Check room availability
-    if (!room.isAvailable) {
-      return res.status(409).json({
-        success: false,
-        message: "Room is not available",
-      });
-    }
-
-    // 4. Create booking
-    const booking = await prisma.booking.create({
-      data: {
-        userId,
-        roomId,
-        checkIn,
-        checkOut,
-        status
-      },
+    const booking = await createBookingService({
+      userId: Number(userId),
+      roomId: result.data.roomId,
+      checkIn: new Date(result.data.checkIn),
+      checkOut: new Date(result.data.checkOut),
     });
 
     return res.status(201).json({
@@ -61,22 +56,21 @@ export const createBooking = async (
       data: booking,
     });
 
-  } catch (error) {
-    return res.status(500).json({
+  } catch (error: any) {
+    return res.status(400).json({
       success: false,
-      message: "Internal server error",
+      message: error.message,
     });
   }
-}
+};
 
-//read-single-room-booking
+
+// READ SINGLE BOOKING
 export const readBooking = async (
   req: Request,
-  res: Response,
-  next: NextFunction
+  res: Response
 ) => {
   try {
-    // validate params
     const result = bookingIdSchema.safeParse(req.params);
 
     if (!result.success) {
@@ -87,12 +81,9 @@ export const readBooking = async (
       });
     }
 
-    const bookingId = result.data.id;
-
-    // find booking
-    const booking = await prisma.booking.findUnique({
-      where: { id: bookingId },
-    });
+    const booking = await getBookingByIdService(
+      result.data.id
+    );
 
     if (!booking) {
       return res.status(404).json({
@@ -107,47 +98,44 @@ export const readBooking = async (
       data: booking,
     });
 
-  } catch (error) {
+  } catch (error: any) {
     return res.status(500).json({
       success: false,
-      message: "Internal server error",
+      message: error.message,
     });
   }
 };
 
-//read-multiple-booking
+
+// READ ALL BOOKINGS
 export const readMultiple = async (
   req: Request,
-  res: Response,
-  next: NextFunction
+  res: Response
 ) => {
   try {
-    // fetch all bookings
-    const bookings = await prisma.booking.findMany();
+    const bookings = await getAllBookingsService();
 
-    //all-sucess
     return res.status(200).json({
       success: true,
       message: "Bookings fetched successfully",
       data: bookings,
     });
 
-  } catch (error) {
+  } catch (error: any) {
     return res.status(500).json({
       success: false,
-      message: "Internal server error",
+      message: error.message,
     });
   }
 };
 
-//update-booking
+
+// UPDATE BOOKING
 export const updateBooking = async (
   req: Request,
-  res: Response,
-  next: NextFunction
+  res: Response
 ) => {
   try {
-    // validate id
     const bookingId = Number(req.params.id);
 
     if (isNaN(bookingId)) {
@@ -157,7 +145,6 @@ export const updateBooking = async (
       });
     }
 
-    // validate body
     const result = updateBookingSchema.safeParse(req.body);
 
     if (!result.success) {
@@ -168,104 +155,68 @@ export const updateBooking = async (
       });
     }
 
-    // update booking
-    const updatedBooking = await prisma.booking.update({
-      where: {
-        id: bookingId,
-      },
-      data: result.data,
-    });
+    const booking = await updateBookingService(
+      bookingId,
+      result.data
+    );
 
     return res.status(200).json({
       success: true,
       message: "Booking updated successfully",
-      data: updatedBooking,
+      data: booking,
     });
 
-  } catch (error) {
+  } catch (error: any) {
     return res.status(500).json({
       success: false,
-      message: "Internal server error",
+      message: error.message,
     });
   }
 };
 
 
-//delete-booking
-export const deleteBooking = async(
-  req:Request,
-  res:Response,
-  next:NextFunction
-)=>{
+// DELETE SINGLE BOOKING
+export const deleteBooking = async (
+  req: Request,
+  res: Response
+) => {
   try {
-      //validation pulling
-      const result = bookingIdSchema.safeParse(req.params);
+    const result = bookingIdSchema.safeParse(req.params);
 
-      //if fails
-      if(!result.success){
-        return res.status(400).json({
-          success:false,
-          message:"Failed to get the records",
-          error:result.error.flatten(),
-        })
-      }
-
-      //pulling the records now
-      const bookingId = result.data.id;
-
-         // check booking exists
-    const existingBooking = await prisma.booking.findUnique({
-      where: { id: bookingId },
-    });
-
-    //if booking fails
-     if (!existingBooking) {
-      return res.status(404).json({
+    if (!result.success) {
+      return res.status(400).json({
         success: false,
-        message: "Booking not found",
+        message: "Invalid booking id",
+        error: result.error.flatten(),
       });
     }
 
-     // delete booking
-    const deletedBooking = await prisma.booking.delete({
-      where: { id: bookingId },
+    const deletedBooking =
+      await deleteBookingService(result.data.id);
+
+    return res.status(200).json({
+      success: true,
+      message: "Booking deleted successfully",
+      data: deletedBooking,
     });
 
-      //if deleted fails
-      if(!existingBooking){
-        return res.status(404).json({
-          success:false,
-          message:"Records not found to be deleted",
-        })
-      };
-
-      //all sucess then
-      return res.status(201).json({
-        success:true,
-        message:"Booking Deleted successfully !!!",
-        data:deleteBooking,
-      })
-
-
-
-
-  } catch (error) {
+  } catch (error: any) {
     return res.status(500).json({
       success: false,
-      message: "Internal server error",
+      message: error.message,
     });
   }
-}
+};
 
-//delete-multiple-booking
+
+// DELETE MULTIPLE BOOKINGS
 export const deleteAllBooking = async (
   req: Request,
-  res: Response,
-  next: NextFunction
+  res: Response
 ) => {
   try {
-    // validate body
-    const result = deleteBookingsSchema.safeParse(req.body);
+    const result =
+      deleteBookingsSchema.safeParse(req.body);
 
     if (!result.success) {
       return res.status(400).json({
@@ -275,16 +226,10 @@ export const deleteAllBooking = async (
       });
     }
 
-    const { ids } = result.data;
-
-    // delete many
-    const deleted = await prisma.booking.deleteMany({
-      where: {
-        id: {
-          in: ids,
-        },
-      },
-    });
+    const deleted =
+      await deleteManyBookingsService(
+        result.data.ids
+      );
 
     return res.status(200).json({
       success: true,
@@ -292,10 +237,10 @@ export const deleteAllBooking = async (
       count: deleted.count,
     });
 
-  } catch (error) {
+  } catch (error: any) {
     return res.status(500).json({
       success: false,
-      message: "Internal server error",
+      message: error.message,
     });
   }
 };

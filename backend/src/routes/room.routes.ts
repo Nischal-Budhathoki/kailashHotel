@@ -7,27 +7,48 @@ import {
   readRoom,
   updateRoom,
 } from "../controllers/room.controller";
+
 import { roomRateLimiter } from "../security/roomRateLimits";
+import { authMiddleware } from "../middleware/userMiddleware";
+import { roleMiddleware } from "../middleware/role.middleware";
 
 const router = express.Router();
 
-// CREATE room
-router.post("/", roomRateLimiter,createRoom);
-
-// GET all rooms
+// PUBLIC ROUTES
 router.get("/", roomRateLimiter, readAllRooms);
+router.get("/:id", roomRateLimiter, readRoom);
 
-// GET single room
-router.get("/:id",roomRateLimiter,  readRoom);
+// ADMIN ROUTES
+router.post(
+  "/",
+  roomRateLimiter,
+  authMiddleware,
+  roleMiddleware(["ADMIN"]),
+  createRoom
+);
 
-// UPDATE room
-router.put("/:id",  roomRateLimiter, updateRoom);
+router.put(
+  "/:id",
+  roomRateLimiter,
+  authMiddleware,
+  roleMiddleware(["ADMIN"]),
+  updateRoom
+);
 
-// DELETE single room
-router.put("/:id",  roomRateLimiter, updateRoom);
-router.delete("/:id",roomRateLimiter,  deleteRoom);
+router.delete(
+  "/:id",
+  roomRateLimiter,
+  authMiddleware,
+  roleMiddleware(["ADMIN"]),
+  deleteRoom
+);
 
-// DELETE multiple rooms
-router.delete("/", roomRateLimiter, deleteMultipleRooms);
+router.delete(
+  "/",
+  roomRateLimiter,
+  authMiddleware,
+  roleMiddleware(["ADMIN"]),
+  deleteMultipleRooms
+);
 
 export default router;
