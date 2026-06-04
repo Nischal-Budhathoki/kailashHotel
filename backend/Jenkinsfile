@@ -1,0 +1,14 @@
+pipeline{
+    agent any
+
+    tools{
+        node js 'NODE JS'
+    }
+
+    stages{
+        
+        stage{
+            
+        }
+    }
+}

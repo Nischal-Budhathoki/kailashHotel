@@ -12,6 +12,7 @@ import userRouter from "./routes/user.routes.js";
 import authRouter from "./routes/auth.routes.js";
 import roomRouter from "./routes/room.routes.js";
 import bookRouter from "./routes/book.routes.js";
+import refreshTokenRouter from "./routes/token.routes.js";
 import { createRateLimiter } from "./security/globalRateLimits.js";
 
 const app = express();
@@ -46,6 +47,7 @@ app.use("/api/v1", userRouter);
 app.use("/api/v1/auth", authRouter);
 app.use("/api/v1/rooms", roomRouter);
 app.use("/api/v1/book", bookRouter);
+app.use("/api/v1/auth/refresh-token", refreshTokenRouter);
 
 //error-handler-middleware
 app.use(errorHandler);
