@@ -16,6 +16,8 @@
   - docker 
   - npm install
   - react-icons
+  - react-datepickers
+  - date-fns
 
 # Running the application
   - npm run dev
