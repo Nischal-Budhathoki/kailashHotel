@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { NavLink } from "react-router-dom";
+import { Link, NavLink } from "react-router-dom";
 import { navConstants } from "../utils/Constants";
 import { GiHamburgerMenu } from "react-icons/gi";
 import { VscChromeClose } from "react-icons/vsc";
@@ -15,9 +15,7 @@ const Navbar = () => {
       {/* Navbar */}
       <nav className="flex items-center justify-between px-6 md:px-32">
         {/* Logo */}
-        <h2 className="text-xl font-bold cursor-pointer">
-          Hotel Kailash
-        </h2>
+        <h2 className="text-xl font-bold cursor-pointer">Hotel Kailash</h2>
 
         {/* Desktop Navigation */}
         <ul className="hidden md:flex items-center gap-8">
@@ -41,8 +39,13 @@ const Navbar = () => {
 
         {/* Desktop Buttons */}
         <div className="hidden md:flex items-center gap-4">
-          <button className={buttonStyles}>Login</button>
-          <button className={buttonStyles}>Sign Up</button>
+          <Link to="/login" className={buttonStyles}>
+            Login
+          </Link>
+
+          <Link to="/signup" className={buttonStyles}>
+            Sign Up
+          </Link>
         </div>
 
         {/* Mobile Toggle Button */}
@@ -65,9 +68,7 @@ const Navbar = () => {
                   onClick={() => setIsOpen(false)}
                   className={({ isActive }) =>
                     `block text-lg ${
-                      isActive
-                        ? "text-blue-600 font-semibold"
-                        : "text-gray-700"
+                      isActive ? "text-blue-600 font-semibold" : "text-gray-700"
                     }`
                   }
                 >
@@ -79,8 +80,21 @@ const Navbar = () => {
 
           {/* Mobile Buttons */}
           <div className="flex flex-col gap-4 mt-8">
-            <button className={buttonStyles}>Login</button>
-            <button className={buttonStyles}>Sign Up</button>
+            <Link
+              to="/login"
+              className={buttonStyles}
+              onClick={() => setIsOpen(false)}
+            >
+              Login
+            </Link>
+
+            <Link
+              to="/signup"
+              className={buttonStyles}
+              onClick={() => setIsOpen(false)}
+            >
+              Sign Up
+            </Link>
           </div>
         </div>
       )}
