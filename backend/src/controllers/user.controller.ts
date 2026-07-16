@@ -5,11 +5,7 @@ import { userIdSchema } from "../zodValidation/idValidation.js";
 import { updateUserSchema } from "../zodValidation/updateValidation.js";
 import { Role } from "../generated/prisma/enums";
 
-
-console.log("This is controller file ")
-
-
-//create-user
+// CREATE USER
 export const userController = async (
   req: Request,
   res: Response,
@@ -28,7 +24,6 @@ export const userController = async (
 
     const { email, name, password, role } = result.data;
 
-    // 🚨 FIX: ensure role is valid Prisma enum
     if (!role) {
       return res.status(400).json({
         success: false,
@@ -41,7 +36,7 @@ export const userController = async (
         email,
         name,
         password,
-        role: role as Role, // ✅ FIX HERE
+        role: role as Role,
       },
     });
 
@@ -49,8 +44,7 @@ export const userController = async (
       success: true,
       data: user,
     });
-
-  } catch (error) {
+  } catch {
     return res.status(500).json({
       success: false,
       message: "Internal Server Error",
@@ -58,8 +52,7 @@ export const userController = async (
   }
 };
 
-
-//read-single-user
+// GET SINGLE USER
 export const userReadController = async (
   req: Request,
   res: Response,
@@ -84,7 +77,6 @@ export const userReadController = async (
         deletedAt: null,
       },
     });
-    console.log(user);
 
     if (!user) {
       return res.status(404).json({
@@ -97,8 +89,7 @@ export const userReadController = async (
       success: true,
       data: user,
     });
-
-  } catch (error) {
+  } catch {
     return res.status(500).json({
       success: false,
       message: "Internal Server Error",
@@ -106,8 +97,7 @@ export const userReadController = async (
   }
 };
 
-
-//read-all-users
+// GET ALL USERS
 export const allUserController = async (
   req: Request,
   res: Response,
@@ -124,8 +114,7 @@ export const allUserController = async (
       success: true,
       data: users,
     });
-
-  } catch (error) {
+  } catch {
     return res.status(500).json({
       success: false,
       message: "Internal Server Error",
@@ -133,8 +122,7 @@ export const allUserController = async (
   }
 };
 
-
-//update-user
+// UPDATE USER
 export const updateUser = async (
   req: Request,
   res: Response,
@@ -177,9 +165,10 @@ export const updateUser = async (
       });
     }
 
-    // 🔥 FIX: remove undefined values
     const cleanData = Object.fromEntries(
-      Object.entries(bodyResult.data).filter(([_, value]) => value !== undefined)
+      Object.entries(bodyResult.data).filter(
+        ([_, value]) => value !== undefined
+      )
     );
 
     const updatedUser = await prisma.user.update({
@@ -192,8 +181,7 @@ export const updateUser = async (
       message: "User updated successfully",
       data: updatedUser,
     });
-
-  } catch (error) {
+  } catch {
     return res.status(500).json({
       success: false,
       message: "Internal Server Error",
@@ -201,7 +189,7 @@ export const updateUser = async (
   }
 };
 
-//soft-delete-user
+// SOFT DELETE USER
 export const deleteUser = async (
   req: Request,
   res: Response,
@@ -243,11 +231,10 @@ export const deleteUser = async (
 
     return res.status(200).json({
       success: true,
-      message: "User deleted successfully (soft delete)",
+      message: "User deleted successfully",
       data: deletedUser,
     });
-
-  } catch (error) {
+  } catch {
     return res.status(500).json({
       success: false,
       message: "Internal Server Error",
@@ -255,8 +242,7 @@ export const deleteUser = async (
   }
 };
 
-
-//delete-many-users
+// SOFT DELETE USERS BY ROLE
 export const deleteUsersByRole = async (
   req: Request,
   res: Response,
@@ -287,8 +273,7 @@ export const deleteUsersByRole = async (
       message: `Users with role ${role} soft deleted`,
       data: result,
     });
-
-  } catch (error) {
+  } catch {
     return res.status(500).json({
       success: false,
       message: "Internal Server Error",
