@@ -127,6 +127,7 @@ exports.Prisma.UserScalarFieldEnum = {
   password: 'password',
   role: 'role',
   deletedAt: 'deletedAt',
+  isActive: 'isActive',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 };
@@ -136,7 +137,7 @@ exports.Prisma.RoomScalarFieldEnum = {
   roomNumber: 'roomNumber',
   type: 'type',
   price: 'price',
-  isAvailable: 'isAvailable',
+  status: 'status',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 };
@@ -145,6 +146,8 @@ exports.Prisma.BookingScalarFieldEnum = {
   id: 'id',
   userId: 'userId',
   roomId: 'roomId',
+  numberOfGuests: 'numberOfGuests',
+  totalPrice: 'totalPrice',
   checkIn: 'checkIn',
   checkOut: 'checkOut',
   status: 'status',
@@ -167,8 +170,14 @@ exports.Prisma.ProfileScalarFieldEnum = {
   userId: 'userId',
   phone: 'phone',
   address: 'address',
+  city: 'city',
   country: 'country',
-  passport: 'passport'
+  passportNumber: 'passportNumber',
+  avatarUrl: 'avatarUrl',
+  gender: 'gender',
+  dateOfBirth: 'dateOfBirth',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
 };
 
 exports.Prisma.SortOrder = {
@@ -187,7 +196,22 @@ exports.Prisma.NullsOrder = {
 };
 exports.Role = exports.$Enums.Role = {
   ADMIN: 'ADMIN',
-  USER: 'USER'
+  USER: 'USER',
+  STAFF: 'STAFF'
+};
+
+exports.RoomType = exports.$Enums.RoomType = {
+  SINGLE: 'SINGLE',
+  DOUBLE: 'DOUBLE',
+  DELUXE: 'DELUXE',
+  SUITE: 'SUITE'
+};
+
+exports.RoomStatus = exports.$Enums.RoomStatus = {
+  AVAILABLE: 'AVAILABLE',
+  OCCUPIED: 'OCCUPIED',
+  CLEANING: 'CLEANING',
+  MAINTENANCE: 'MAINTENANCE'
 };
 
 exports.BookingStatus = exports.$Enums.BookingStatus = {
@@ -195,6 +219,28 @@ exports.BookingStatus = exports.$Enums.BookingStatus = {
   CONFIRMED: 'CONFIRMED',
   CANCELLED: 'CANCELLED',
   COMPLETED: 'COMPLETED'
+};
+
+exports.PaymentMethod = exports.$Enums.PaymentMethod = {
+  CASH: 'CASH',
+  CARD: 'CARD',
+  ESEWA: 'ESEWA',
+  KHALTI: 'KHALTI',
+  STRIPE: 'STRIPE',
+  BANK_TRANSFER: 'BANK_TRANSFER'
+};
+
+exports.PaymentStatus = exports.$Enums.PaymentStatus = {
+  PENDING: 'PENDING',
+  PAID: 'PAID',
+  FAILED: 'FAILED',
+  REFUNDED: 'REFUNDED'
+};
+
+exports.Gender = exports.$Enums.Gender = {
+  MALE: 'MALE',
+  FEMALE: 'FEMALE',
+  OTHERS: 'OTHERS'
 };
 
 exports.Prisma.ModelName = {
