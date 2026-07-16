@@ -1,12 +1,9 @@
 import { Request, Response } from "express";
-import jwt from "jsonwebtoken";
 import bcrypt from "bcryptjs";
 import { prisma } from "../config/prisma";
-import { Role, User } from "../generated/prisma";
-import { comparePassword } from "../utils/password";
 import { generateAccessToken, generateRefreshToken } from "../utils/jwt";
 
-const JWT_SECRET = process.env.JWT_SECRET as string;
+
 
 type LoginInput = {
   email: string;
@@ -40,8 +37,13 @@ export const loginUser = async ({ email, password }: LoginInput) => {
     role: user.role,
   };
 
-  const accessToken = generateAccessToken(payload);
-  const refreshToken = generateRefreshToken(payload);
+ console.log("Generating Access Token...");
+const accessToken = generateAccessToken(payload);
+console.log("Access Token Generated");
+
+console.log("Generating Refresh Token...");
+const refreshToken = generateRefreshToken(payload);
+console.log("Refresh Token Generated");
 
   return {
     user,
@@ -80,12 +82,20 @@ export const loginController = async (req: Request, res: Response) => {
       accessToken: result.accessToken,
       user: result.user,
     });
-  } catch (error: any) {
-    return res.status(401).json({
-      success: false,
-      message: error.message,
-    });
+  } catch (error) {
+  console.error("========== LOGIN ERROR ==========");
+
+  if (error instanceof Error) {
+    console.error(error.stack);
+  } else {
+    console.error(error);
   }
+
+  return res.status(401).json({
+    success: false,
+    message: error instanceof Error ? error.message : "Unknown error",
+  });
+}
 };
 
 //logout controller
