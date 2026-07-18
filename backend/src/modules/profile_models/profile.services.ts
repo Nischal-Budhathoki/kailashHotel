@@ -1,8 +1,5 @@
-import {
-  PrismaClient,
-  Profile,
-  User,
-} from "../../generated/prisma/client";
+import bcrypt from "bcryptjs";
+import { PrismaClient, Profile, User } from "../../generated/prisma/client";
 
 import {
   UpdateProfileDto,
@@ -11,9 +8,7 @@ import {
 } from "./profile.types";
 
 export class ProfileService {
-  constructor(
-    private readonly prisma: PrismaClient
-  ) {}
+  constructor(private readonly prisma: PrismaClient) {}
 
   /**
    * Get profile of logged in user
@@ -39,7 +34,7 @@ export class ProfileService {
    */
   public async updateProfile(
     userId: number,
-    data: UpdateProfileDto
+    data: UpdateProfileDto,
   ): Promise<Profile> {
     await this.findUser(userId);
 
@@ -58,7 +53,7 @@ export class ProfileService {
    */
   public async changePassword(
     userId: number,
-    dto: ChangePasswordDto
+    dto: ChangePasswordDto,
   ): Promise<void> {
     const user = await this.findUser(userId);
 
@@ -68,7 +63,43 @@ export class ProfileService {
      * Update password
      */
 
-    console.log(user, dto);
+    // comparing password
+    const isPasswordValid = await bcrypt.compare(
+      dto.currentPassword,
+      user.password,
+    );
+
+    // if password is false,
+    if (!isPasswordValid) {
+      throw new Error("Password did not match !! Try again");
+    }
+
+    // hash password
+    const hashedPassword = await bcrypt.hash(dto.newPassword, 12);
+
+    // updating the prisma file
+    await this.prisma.user.update({
+      where: {
+        id: userId,
+      },
+      data: {
+        password: hashedPassword,
+      },
+    });
+
+    // verify password
+    const isSamePassword = await bcrypt.compare(
+      dto.newPassword,
+      user.password
+    );
+
+    // if same password is not matching then
+    if (isSamePassword) {
+    throw new Error(
+        "New password must be different from the current password."
+    );
+}
+
   }
 
   /**
@@ -76,7 +107,7 @@ export class ProfileService {
    */
   public async uploadAvatar(
     userId: number,
-    dto: UploadAvatarDto
+    dto: UploadAvatarDto,
   ): Promise<Profile> {
     await this.findUser(userId);
 
@@ -93,9 +124,7 @@ export class ProfileService {
   /**
    * Find User
    */
-  private async findUser(
-    userId: number
-  ): Promise<User> {
+  private async findUser(userId: number): Promise<User> {
     const user = await this.prisma.user.findUnique({
       where: {
         id: userId,
@@ -112,9 +141,7 @@ export class ProfileService {
   /**
    * Validate Profile
    */
-  private validateProfile(
-    data: UpdateProfileDto
-  ): void {
+  private validateProfile(data: UpdateProfileDto): void {
     if (data.phone && data.phone.length < 7) {
       throw new Error("Invalid phone number");
     }

@@ -3,7 +3,7 @@ import { prisma } from "../config/prisma";
 import { createUserSchema } from "../zodValidation/userValidation.js";
 import { userIdSchema } from "../zodValidation/idValidation.js";
 import { updateUserSchema } from "../zodValidation/updateValidation.js";
-import { Role } from "../generated/prisma/enums";
+import { Role } from "../generated/prisma/client";
 
 // CREATE USER
 export const userController = async (

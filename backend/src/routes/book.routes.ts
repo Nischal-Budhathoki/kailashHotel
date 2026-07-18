@@ -8,7 +8,7 @@ import {
   deleteAllBooking,
 } from "../controllers/book.controller.js";
 import { bookRateLimiter } from "../security/bookRateLimits.js";
-import { authMiddleware } from "../middleware/userMiddleware.js";
+import { authenticate } from "../middleware/user.middleware.js";
 import { roleMiddleware } from "../middleware/role.middleware.js";
 
 const router = express.Router();
@@ -17,7 +17,7 @@ const router = express.Router();
 router.post(
   "/",
   bookRateLimiter,
-  authMiddleware,
+  authenticate,
   roleMiddleware(["USER"]),
   createBooking
 );
@@ -26,7 +26,7 @@ router.post(
 router.get(
   "/",
   bookRateLimiter,
-  authMiddleware,
+  authenticate,
   roleMiddleware(["ADMIN"]),
   readMultiple
 );
@@ -35,7 +35,7 @@ router.get(
 router.get(
   "/:id",
   bookRateLimiter,
-  authMiddleware,
+  authenticate,
   roleMiddleware(["USER", "ADMIN"]),
   readBooking
 );
@@ -44,7 +44,7 @@ router.get(
 router.put(
   "/:id",
   bookRateLimiter,
-  authMiddleware,
+  authenticate,
   roleMiddleware(["USER", "ADMIN"]),
   updateBooking
 );
@@ -53,7 +53,7 @@ router.put(
 router.delete(
   "/:id",
   bookRateLimiter,
-  authMiddleware,
+  authenticate,
   roleMiddleware(["USER", "ADMIN"]),
   deleteBooking
 );
@@ -62,7 +62,7 @@ router.delete(
 router.delete(
   "/",
   bookRateLimiter,
-  authMiddleware,
+  authenticate,
   roleMiddleware(["ADMIN"]),
   deleteAllBooking
 );

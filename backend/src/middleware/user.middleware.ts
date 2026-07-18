@@ -3,7 +3,7 @@ import jwt, { JwtPayload } from "jsonwebtoken";
 
 // 1. Define a strict user type (IMPORTANT for real projects)
 export interface AuthUser extends JwtPayload {
-  id: string;
+  id: number;
   email?: string;
   role?: string;
 }
@@ -30,7 +30,7 @@ const extractToken = (header?: string) => {
   return parts[1];
 };
 
-export const authMiddleware = (
+export const authenticate = (
   req: Request,
   res: Response,
   next: NextFunction
@@ -57,10 +57,13 @@ export const authMiddleware = (
   }
 
   try {
-    const decoded = jwt.verify(token, secret);
+    const decoded = jwt.verify(token, secret) as AuthUser;
 
     // Ensure correct type casting
-    req.user = decoded as AuthUser;
+    req.user = {
+  ...decoded,
+  id: Number(decoded.id),
+};
 
     return next();
   } catch (error) {

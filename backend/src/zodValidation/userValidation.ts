@@ -1,5 +1,5 @@
 import { z } from "zod"
-import { Role } from "../generated/prisma/enums";
+import { Role } from "../generated/prisma/client";
 
 export const userRoleEnum = z.enum(["ADMIN", "USER"]);
 

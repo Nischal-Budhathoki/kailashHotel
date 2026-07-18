@@ -3,7 +3,7 @@ import { createRoomSchema } from "../zodValidation/roomValidation";
 import { prisma } from "../config/prisma";
 import { success } from "zod";
 import { deleteRoomsSchema, roomIdSchema } from "../zodValidation/roomIdValidation";
-import { error } from "node:console";
+import { RoomType } from "../generated/prisma";
 
 //creating-room
 export const createRoom = async (
@@ -30,7 +30,7 @@ export const createRoom = async (
       data: {
         roomNumber,
         price,
-        type,
+        type: RoomType.SINGLE,
         //only send if exists
         ...(isAvailable !== undefined && { isAvailable }),
       },

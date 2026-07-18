@@ -9,7 +9,7 @@ import {
 } from "../controllers/room.controller";
 
 import { roomRateLimiter } from "../security/roomRateLimits";
-import { authMiddleware } from "../middleware/userMiddleware";
+import { authenticate } from "../middleware/user.middleware";
 import { roleMiddleware } from "../middleware/role.middleware";
 
 const router = express.Router();
@@ -22,7 +22,7 @@ router.get("/:id", roomRateLimiter, readRoom);
 router.post(
   "/",
   roomRateLimiter,
-  authMiddleware,
+  authenticate,
   roleMiddleware(["ADMIN"]),
   createRoom
 );
@@ -30,7 +30,7 @@ router.post(
 router.put(
   "/:id",
   roomRateLimiter,
-  authMiddleware,
+  authenticate,
   roleMiddleware(["ADMIN"]),
   updateRoom
 );
@@ -38,7 +38,7 @@ router.put(
 router.delete(
   "/:id",
   roomRateLimiter,
-  authMiddleware,
+  authenticate,
   roleMiddleware(["ADMIN"]),
   deleteRoom
 );
@@ -46,7 +46,7 @@ router.delete(
 router.delete(
   "/",
   roomRateLimiter,
-  authMiddleware,
+  authenticate,
   roleMiddleware(["ADMIN"]),
   deleteMultipleRooms
 );
